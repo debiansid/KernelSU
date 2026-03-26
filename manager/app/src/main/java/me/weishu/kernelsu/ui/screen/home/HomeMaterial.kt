@@ -65,7 +65,10 @@ import me.weishu.kernelsu.ui.component.dialog.rememberConfirmDialog
 import me.weishu.kernelsu.ui.component.material.TonalCard
 import me.weishu.kernelsu.ui.component.rebootlistpopup.RebootListPopup
 import me.weishu.kernelsu.ui.component.statustag.StatusTag
+import me.weishu.kernelsu.ui.theme.LocalClassicUi
 import me.weishu.kernelsu.ui.theme.LocalEnableOfficialLauncher
+import me.weishu.kernelsu.ui.util.getModuleCount
+import me.weishu.kernelsu.ui.util.getSuperuserCount
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -186,6 +189,7 @@ private fun StatusCard(
     state: HomeUiState,
     actions: HomeActions,
 ) {
+    val classicUi = LocalClassicUi.current
     Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
         TonalCard(
             containerColor = if (state.ksuVersion != null) {
@@ -247,6 +251,19 @@ private fun StatusCard(
                                 text = stringResource(R.string.home_working_version, state.ksuVersion),
                                 style = MaterialTheme.typography.bodyMedium
                             )
+                            if (classicUi) {
+                                Spacer(Modifier.height(4.dp))
+                                Text(
+                                    text = stringResource(
+                                        R.string.home_superuser_count, getSuperuserCount()
+                                    ), style = MaterialTheme.typography.bodyMedium
+                                )
+                                Spacer(Modifier.height(4.dp))
+                                Text(
+                                    text = stringResource(R.string.home_module_count, getModuleCount()),
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
+                            }
                         }
                     }
 
@@ -297,7 +314,7 @@ private fun StatusCard(
                 }
             }
         }
-        if (state.isFullFeatured) {
+        if (state.isFullFeatured && !classicUi) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
@@ -443,6 +460,7 @@ private fun DonateCard(onOpenUrl: (String) -> Unit) {
 @Composable
 private fun InfoCard(systemInfo: SystemInfo) {
     val isOfficial = LocalEnableOfficialLauncher.current
+    val isClassicUi = LocalClassicUi.current
 
     TonalCard {
         Column(
@@ -459,8 +477,10 @@ private fun InfoCard(systemInfo: SystemInfo) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    icon()
-                    Spacer(Modifier.width(16.dp))
+                    if (!isClassicUi) {
+                        icon()
+                        Spacer(Modifier.width(16.dp))
+                    }
                     Column {
                         Text(text = label, style = MaterialTheme.typography.bodyLarge)
                         Text(
@@ -582,6 +602,7 @@ private fun HomeScreenPreviewContent(
     superuserCount: Int = 0,
     moduleCount: Int = 0,
     selinuxStatus: String = "Enforcing",
+    classicUi: Boolean = false,
 ) {
     CompositionLocalProvider(LocalUriHandler provides previewUriHandler) {
         Column(
@@ -598,6 +619,7 @@ private fun HomeScreenPreviewContent(
                     superuserCount = superuserCount,
                     moduleCount = moduleCount,
                     selinuxStatus = selinuxStatus,
+                    classicUi = classicUi,
                 ),
                 actions = actions
             )
@@ -640,8 +662,10 @@ private fun previewHomeScreenState(
     superuserCount: Int = 0,
     moduleCount: Int = 0,
     selinuxStatus: String = "Enforcing",
+    classicUi: Boolean = false,
 ) = HomeUiState(
     appName = "KernelSU",
+    classicUi = classicUi,
     kernelVersion = KernelVersion(6, 1, 0),
     ksuVersion = ksuVersion,
     lkmMode = lkmMode,
