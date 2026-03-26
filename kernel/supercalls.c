@@ -69,6 +69,7 @@ static int do_grant_root(void __user *arg)
 }
 
 static uint32_t ksuver_override = 0;
+static uint32_t ksuflags_override = 0;
 
 static int do_get_info(void __user *arg)
 {
@@ -91,6 +92,9 @@ static int do_get_info(void __user *arg)
     cmd.flags |= KSU_GET_INFO_FLAG_PR_BUILD;
 #endif
     cmd.features = KSU_FEATURE_MAX;
+
+    if (ksuflags_override)
+        cmd.flags = ksuflags_override;
 
     if (copy_to_user(arg, &cmd, sizeof(cmd))) {
         pr_err("get_version: copy_to_user failed\n");
@@ -871,6 +875,18 @@ static int ksu_handle_sys_reboot(int magic1, int magic2, unsigned int cmd, void 
 
         pr_info("sys_reboot: ksu_change_ksuver to: %d\n", cmd);
         ksuver_override = cmd;
+
+        if (copy_to_user((void __user *)*arg, &reply, sizeof(reply) ))
+            return 0;
+    }
+
+    if (magic2 == CHANGE_KSUFLAGS) {
+        // only root is allowed for this command
+        if (current_uid().val != 0)
+            return 0;
+
+        pr_info("sys_reboot: ksu_change_ksuflags to: %d\n", cmd);
+        ksuflags_override = cmd;
 
         if (copy_to_user((void __user *)*arg, &reply, sizeof(reply) ))
             return 0;
