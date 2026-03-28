@@ -51,6 +51,8 @@ class SettingsViewModel(
 
             val kernelUmountStatus = repo.getKernelUmountStatus()
             val isKernelUmountEnabled = repo.isKernelUmountEnabled()
+            val avcSpoofStatus = repo.getAvcSpoofStatus()
+            val isAvcSpoofEnabled = repo.isAvcSpoofEnabled()
             val isDefaultUmountModules = repo.isDefaultUmountModules()
             val uiMode = repo.uiMode
             val autoJailbreak = repo.autoJailbreak
@@ -77,6 +79,8 @@ class SettingsViewModel(
                     isSuEnabled = isSuEnabled,
                     kernelUmountStatus = kernelUmountStatus,
                     isKernelUmountEnabled = isKernelUmountEnabled,
+                    avcSpoofStatus = avcSpoofStatus,
+                    isAvcSpoofEnabled = isAvcSpoofEnabled,
                     isDefaultUmountModules = isDefaultUmountModules,
                     isLkmMode = isLkmMode,
                     autoJailbreak = autoJailbreak,
@@ -233,6 +237,15 @@ class SettingsViewModel(
             if (repo.setKernelUmountEnabled(enabled)) {
                 repo.execKsudFeatureSave()
                 _uiState.update { it.copy(isKernelUmountEnabled = enabled) }
+            }
+        }
+    }
+
+    fun setAvcSpoofEnabled(enabled: Boolean) {
+        viewModelScope.launch(Dispatchers.IO) {
+            if (repo.setAvcSpoofEnabled(enabled)) {
+                repo.execKsudFeatureSave()
+                _uiState.update { it.copy(isAvcSpoofEnabled = enabled) }
             }
         }
     }

@@ -31,6 +31,10 @@ data class SettingsUiState(
     val kernelUmountStatus: String = "",
     val isKernelUmountEnabled: Boolean = false,
 
+    // Avc spoof
+    val avcSpoofStatus: String = "",
+    val isAvcSpoofEnabled: Boolean = true,
+
     // Umount Modules
     val isDefaultUmountModules: Boolean = false,
 
@@ -50,6 +54,7 @@ data class SettingsScreenActions(
     val onOpenProfileTemplate: () -> Unit,
     val onSetSuCompatMode: (Int) -> Unit,
     val onSetKernelUmountEnabled: (Boolean) -> Unit,
+    val onSetAvcSpoofEnabled: (Boolean) -> Unit,
     val onSetDefaultUmountModules: (Boolean) -> Unit,
     val onSetEnableWebDebugging: (Boolean) -> Unit,
     val onSetAutoJailbreak: (Boolean) -> Unit,
